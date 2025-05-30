@@ -1,6 +1,7 @@
 module com.example.tarea2 {
     requires javafx.controls;
     requires javafx.fxml;
+    requires javafx.media;
     requires javafx.web;
 
     requires org.controlsfx.controls;
@@ -13,6 +14,6 @@ module com.example.tarea2 {
 
     opens com.example.tarea2 to javafx.fxml;
     exports com.example.tarea2;
-    exports com.example.tarea2.pubsub;
     exports com.example.tarea2.ui;
+    exports com.example.tarea2.pubsub;
 }

@@ -3,20 +3,27 @@ package com.example.tarea2.pubsub;
 import java.util.*;
 
 public class Broker {
-    private final Map<Topic, List<Subscriber>> subscribers = new HashMap<>();
+    private static Broker instance = new Broker();
+    private final Map<String, List<Subscriber>> subs = new HashMap<>();
 
-    public void subscribe(Subscriber sub, Topic topic) {
-        subscribers
-                .computeIfAbsent(topic, t -> new ArrayList<>())
-                .add(sub);
-        sub.setBroker(this);
-        sub.setTopic(topic);
+    private Broker() {}
+
+    public static Broker getInstance() {
+        return instance;
+    }
+
+    public void registerTopic(Topic topic) {
+        subs.putIfAbsent(topic.getName(), new ArrayList<>());
+    }
+
+    public void subscribe(Topic topic, Subscriber s) {
+        subs.computeIfAbsent(topic.getName(), k -> new ArrayList<>()).add(s);
     }
 
     public void publish(Topic topic, String message) {
-        List<Subscriber> subs = subscribers.get(topic);
-        if (subs != null) {
-            for (Subscriber s : subs) {
+        List<Subscriber> list = subs.get(topic.getName());
+        if (list != null) {
+            for (Subscriber s : list) {
                 s.onMessage(message);
             }
         }

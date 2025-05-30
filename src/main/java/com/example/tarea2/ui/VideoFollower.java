@@ -1,35 +1,41 @@
 package com.example.tarea2.ui;
 
+import com.example.tarea2.pubsub.Broker;
 import com.example.tarea2.pubsub.Subscriber;
-import javafx.application.Platform;
-import javafx.geometry.Insets;
-import javafx.scene.Parent;
+import com.example.tarea2.pubsub.Topic;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
 
 public class VideoFollower extends Subscriber {
-    private final VBox view;
-    private final Button button;
+    private Button videoButton;
+    private HBox view;
+    private final String topic;
+    private final Broker broker;
 
-    public VideoFollower(String name) {
-        view = new VBox(10);
-        view.setPadding(new Insets(10));
-        // Título con el nombre del Subscriber
-        Label title = new Label(name);
-        // Botón que mostrará la última URL recibida
-        button = new Button("No video yet");
-        view.getChildren().addAll(title, button);
+    public VideoFollower(String name, String topic, Broker broker) {
+        super(); // Tu clase Subscriber ya no acepta parámetros
+        this.topic = topic;
+        this.broker = broker;
+
+        this.videoButton = new Button("Esperando publicación...");
+        this.view = new HBox(10);
+        this.view.getChildren().add(videoButton);
+
+        videoButton.setOnAction(e -> {
+            String url = videoButton.getText();
+            if (!url.startsWith("http")) return;
+            VideoPlayer.reproducir(url);
+        });
+
+        broker.subscribe(new Topic(topic), this);
     }
 
     @Override
     public void onMessage(String message) {
-        // Actualizamos el texto del botón en el hilo de JavaFX
-        Platform.runLater(() -> button.setText(message));
+        videoButton.setText(message);
     }
 
-    /** Retorna el nodo raíz para incrustar en un Scene */
-    public Parent getView() {
+    public HBox getView() {
         return view;
     }
 }
