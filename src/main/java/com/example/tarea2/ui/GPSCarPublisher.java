@@ -17,6 +17,11 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Publicador de posiciones GPS de un vehículo.
+ * Lee un archivo de posiciones, genera puntos interpolados
+ * y publica periódicamente la ubicación en un topic.
+ */
 public class GPSCarPublisher extends Publisher {
     private final VBox view;
     private final Label statusLabel;
@@ -24,6 +29,14 @@ public class GPSCarPublisher extends Publisher {
     private int currentIndex = 0;
     private Timeline timeline;
 
+    /**
+     * Crea un GPSCarPublisher con nombre, topic y stage para la UI.
+     * Registra el topic en el broker e inicializa la vista de JavaFX.
+     *
+     * @param name  Nombre identificador del publisher.
+     * @param topic Topic en el que se publicarán los mensajes.
+     * @param stage Stage principal de JavaFX para mostrar diálogos de archivo.
+     */
     public GPSCarPublisher(String name, Topic topic, Stage stage) {
         super(name);
         this.setBroker(Broker.getInstance());
@@ -43,6 +56,11 @@ public class GPSCarPublisher extends Publisher {
         }
     }
 
+    /**
+     * Carga e interpola puntos de posición desde un archivo.
+     *
+     * @param file Archivo de texto con registros GPS (tiempo, x, y).
+     */
     private void loadAndInterpolatePositions(File file) {
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             List<Position> raw = new ArrayList<>();
@@ -78,6 +96,10 @@ public class GPSCarPublisher extends Publisher {
         }
     }
 
+    /**
+     * Inicia la publicación periódica de las posiciones interpoladas
+     * utilizando un Timeline de JavaFX.
+     */
     private void startPublishing() {
         if (points.isEmpty()) {
             statusLabel.setText("No hay puntos para publicar");
@@ -106,10 +128,18 @@ public class GPSCarPublisher extends Publisher {
         timeline.play();
     }
 
+    /**
+     * Devuelve la vista de JavaFX que muestra el estado y controles.
+     *
+     * @return Contenedor VBox con la interfaz de este publisher.
+     */
     public VBox getView() {
         return view;
     }
 
+    /**
+     * Clases internas de soporte
+     */
     private static class Position {
         int time;
         double x, y;
